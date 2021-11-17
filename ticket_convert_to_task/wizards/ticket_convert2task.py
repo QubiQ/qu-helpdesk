@@ -58,6 +58,14 @@ class TicketConvert2Task(models.TransientModel):
         attachments.write({
             'res_model': 'project.task', 'res_id': task.id
         })
+        # Copy Followers
+        for follower in ticket.message_follower_ids:
+            if follower.partner_id not in\
+                    task.message_follower_ids.mapped('partner_id'):
+                follower.copy({
+                    'res_model': 'project.task',
+                    'res_id': task.id,
+                })
         # Archive the ticket and send the timesheets to the new Task
         ticket.write({
             'active': False,
